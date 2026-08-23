@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #06070a;
+  --carbon: #0c0f13;
+  --panel: rgba(15, 18, 24, 0.76);
+  --line: rgba(255, 255, 255, 0.09);
+  --muted: #96a0ae;
+  --neon: #c8ff00;
+  --cyan: #5ee7ff;
+  --orange: #ff7447;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; background: var(--ink); }
+body { margin: 0; background: var(--ink); color: #f6f8fb; font-family: Arial, Helvetica, sans-serif; }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+
+.carbon-grid {
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.grain { background-image: radial-gradient(rgba(255,255,255,.13) .65px, transparent .65px); background-size: 6px 6px; opacity: .08; mix-blend-mode: overlay; }
+.glass { background: linear-gradient(145deg, rgba(22,27,35,.83), rgba(9,11,15,.72)); border: 1px solid var(--line); box-shadow: 0 24px 70px rgba(0,0,0,.28); backdrop-filter: blur(18px); }
+.edge { border: 1px solid rgba(200,255,0,.24); box-shadow: inset 0 0 0 1px rgba(255,255,255,.025), 0 0 45px rgba(200,255,0,.08); }
+.neon-text { color: var(--neon); text-shadow: 0 0 22px rgba(200,255,0,.36); }
+.neon-button { background: var(--neon); color: #090b08; box-shadow: 0 12px 38px rgba(200,255,0,.21); transition: transform .2s ease, box-shadow .2s ease; }
+.neon-button:hover { transform: translateY(-2px); box-shadow: 0 18px 42px rgba(200,255,0,.35); }
+.outline-button { border: 1px solid var(--line); color: #e7eaf0; background: rgba(255,255,255,.035); transition: border .2s ease, background .2s ease; }
+.outline-button:hover { border-color: rgba(200,255,0,.45); background: rgba(200,255,0,.06); }
+
+.orbital-stage { perspective: 1000px; }
+.orbital-core { transform-style: preserve-3d; animation: core-float 7s ease-in-out infinite; }
+.ring { position: absolute; left: 50%; top: 50%; border: 1px solid rgba(200,255,0,.36); border-radius: 999px; transform-style: preserve-3d; }
+.ring-one { width: 25rem; height: 9rem; transform: translate(-50%, -50%) rotateX(68deg) rotateZ(-18deg); animation: orbit-one 10s linear infinite; }
+.ring-two { width: 19rem; height: 19rem; border-color: rgba(94,231,255,.28); transform: translate(-50%, -50%) rotateY(67deg) rotateZ(32deg); animation: orbit-two 14s linear infinite reverse; }
+.ring-three { width: 29rem; height: 13rem; border-color: rgba(255,116,71,.22); transform: translate(-50%, -50%) rotateX(54deg) rotateZ(28deg); animation: orbit-three 16s linear infinite; }
+.cube { transform-style: preserve-3d; animation: cube-spin 18s linear infinite; }
+.cube-face { position: absolute; inset: 0; border: 1px solid rgba(200,255,0,.36); background: rgba(200,255,0,.035); }
+.cube-face:nth-child(1) { transform: translateZ(48px); }.cube-face:nth-child(2) { transform: rotateY(180deg) translateZ(48px); }.cube-face:nth-child(3) { transform: rotateY(90deg) translateZ(48px); }.cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(48px); }.cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(48px); }.cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(48px); }
+
+@keyframes core-float { 0%,100%{transform:translateY(0) rotateX(0)} 50%{transform:translateY(-12px) rotateX(4deg)} }
+@keyframes orbit-one { to{ transform:translate(-50%,-50%) rotateX(68deg) rotateZ(342deg);} }
+@keyframes orbit-two { to{ transform:translate(-50%,-50%) rotateY(67deg) rotateZ(-328deg);} }
+@keyframes orbit-three { to{ transform:translate(-50%,-50%) rotateX(54deg) rotateZ(388deg);} }
+@keyframes cube-spin { to { transform: rotateX(360deg) rotateY(360deg); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
