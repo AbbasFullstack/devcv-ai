@@ -1,0 +1,31 @@
+name: Deploy DevCV Cloudflare Worker
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: devcv-cloudflare-worker-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy private resume-analysis Worker
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: cloudflare-production
+    steps:
+      - uses: actions/checkout@v6
+      - name: Deploy Worker and set server-to-server secret
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: cloudflare-worker
+          command: deploy
+          secrets: |
+            WORKER_SHARED_SECRET
+        env:
+          WORKER_SHARED_SECRET: ${{ secrets.DEVCV_WORKER_SHARED_SECRET }}

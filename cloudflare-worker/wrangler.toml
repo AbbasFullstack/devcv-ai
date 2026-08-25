@@ -1,0 +1,7 @@
+name = "devcv-ai-resume-analysis"
+main = "src/index.ts"
+compatibility_date = "2026-08-25"
+workers_dev = true
+
+[ai]
+binding = "AI"
