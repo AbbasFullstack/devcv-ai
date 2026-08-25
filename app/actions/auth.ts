@@ -19,7 +19,7 @@ export async function signIn(_: AuthState, formData: FormData): Promise<AuthStat
 export async function signUp(_: AuthState, formData: FormData): Promise<AuthState> {
   const input = parse(formData); if (!input.success) return { error: input.error.issues[0]?.message };
   const client = await createSupabaseServerClient(); if (!client) return { error: "Authentication is not configured yet. Add Supabase environment variables first." };
-  const { error, data } = await client.auth.signUp({ email: input.data.email, password: input.data.password, options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/dashboard` } });
+  const { error, data } = await client.auth.signUp({ email: input.data.email, password: input.data.password, options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback` } });
   if (error) return { error: error.message };
   if (!data.session) return { message: "Account created. Check your email to confirm your address, then sign in." };
   redirect("/dashboard");
