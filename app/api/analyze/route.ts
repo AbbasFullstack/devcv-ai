@@ -15,8 +15,15 @@ export async function POST(request: Request) {
   try {
     const response = provider.kind === "cloudflare-worker"
       ? await fetch(`${provider.url}/analyze`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${provider.sharedSecret}` }, body: JSON.stringify(parsed.data), cache: "no-store" })
+      : provider.kind === "vercel-ai-gateway"
+        ? await fetch(`${provider.url}/chat/completions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${provider.oidcToken}` }, body: JSON.stringify({ model: provider.model, response_format: { type: "json_object" }, messages: [{ role: "system", content: "You are a precise resume analyst in a limited beta. Return JSON only with overallScore, atsScore, clarityScore, impactScore, keywords, findings, summaryRewrite. Do not invent employers, degrees, metrics, technologies, or achievements. Frame uncertain suggestions conditionally." }, { role: "user", content: `Target role: ${parsed.data.role}\n\nResume:\n${parsed.data.resume}` }] }), cache: "no-store" })
       : await fetch(`${provider.url}/chat/completions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${provider.apiKey}` }, body: JSON.stringify({ model: provider.model, response_format: { type: "json_object" }, messages: [{ role: "system", content: "You are a precise resume analyst. Return JSON only with overallScore, atsScore, clarityScore, impactScore, keywords, findings, summaryRewrite. Do not invent employers, degrees, metrics, technologies, or achievements. Frame uncertain suggestions conditionally." }, { role: "user", content: `Target role: ${parsed.data.role}\n\nResume:\n${parsed.data.resume}` }] }) });
-    if (!response.ok) return NextResponse.json({ error: "The AI provider could not complete this request." }, { status: 502 });
+    if (!response.ok) {
+      const error = provider.kind === "vercel-ai-gateway"
+        ? response.status === 429 ? "The Vercel AI beta quota is temporarily exhausted. Try again later; no resume was saved." : "The Vercel AI beta is temporarily unavailable. No resume was saved."
+        : "The AI provider could not complete this request.";
+      return NextResponse.json({ error }, { status: 502 });
+    }
     const payload = await response.json() as { analysis?: unknown; choices?: { message?: { content?: string } }[] };
     const rawAnalysis = provider.kind === "cloudflare-worker" ? payload.analysis : payload.choices?.[0]?.message?.content;
     if (!rawAnalysis) return NextResponse.json({ error: "The AI provider returned an empty response." }, { status: 502 });
