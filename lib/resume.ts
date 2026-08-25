@@ -1,13 +1,40 @@
-export type ResumeFinding = { category: string; severity: "high" | "medium" | "low"; title: string; detail: string };
-export type ResumeAnalysis = {
-  overallScore: number;
-  atsScore: number;
-  clarityScore: number;
-  impactScore: number;
-  keywords: string[];
-  findings: ResumeFinding[];
-  summaryRewrite: string;
-  isPreview: boolean;
+import { z } from "zod";
+
+export const resumeFindingSchema = z.object({
+  category: z.string().min(1).max(80),
+  severity: z.enum(["high", "medium", "low"]),
+  title: z.string().min(1).max(160),
+  detail: z.string().min(1).max(1200),
+}).strict();
+
+export const analysisPayloadSchema = z.object({
+  overallScore: z.number().int().min(0).max(100),
+  atsScore: z.number().int().min(0).max(100),
+  clarityScore: z.number().int().min(0).max(100),
+  impactScore: z.number().int().min(0).max(100),
+  keywords: z.array(z.string().min(1).max(80)).min(3).max(12),
+  findings: z.array(resumeFindingSchema).min(1).max(8),
+  summaryRewrite: z.string().min(30).max(1000),
+}).strict();
+
+export const realAnalysisSchema = analysisPayloadSchema.extend({ isPreview: z.literal(false) }).strict();
+
+export const resumeSaveInputSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+  role: z.string().trim().min(2).max(100),
+  resume: z.string().trim().min(80).max(24000),
+  analysis: realAnalysisSchema.optional(),
+}).strict();
+
+export type ResumeAnalysis = z.infer<typeof analysisPayloadSchema> & { isPreview: boolean };
+export type SavedResumeVersion = {
+  id: string;
+  title: string;
+  target_role: string | null;
+  resume_text: string;
+  created_at: string;
+  updated_at: string;
+  analysis_runs?: { id: string; overall_score: number | null; created_at: string; result: unknown }[];
 };
 
 export const previewAnalysis: ResumeAnalysis = {
