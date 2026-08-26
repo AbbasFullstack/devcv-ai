@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   if (isSupabaseConfigured && !(await getCurrentUser())) return NextResponse.json({ error: "Sign in to run AI analysis." }, { status: 401 });
   const parsed = requestSchema.safeParse(await request.json());
   if (!parsed.success) return NextResponse.json({ error: "Add a target role and at least 80 characters of resume content." }, { status: 400 });
-  const provider = getAnalysisProviderConfig();
+  const provider = getAnalysisProviderConfig(undefined, request.headers.get("x-vercel-oidc-token") ?? undefined);
   if (!provider) return NextResponse.json({ error: "AI analysis is not configured yet. Use sample feedback while the server-only provider key is being added." }, { status: 503 });
   try {
     const response = provider.kind === "cloudflare-worker"

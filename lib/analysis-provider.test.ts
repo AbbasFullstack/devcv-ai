@@ -14,4 +14,8 @@ describe("analysis provider selection", () => {
   it("uses Vercel OIDC for the approved no-key beta path before a generic provider fallback", () => {
     expect(getAnalysisProviderConfig({ VERCEL_OIDC_TOKEN: "short-lived-vercel-token", AI_API_KEY: "provider-secret" })).toEqual({ kind: "vercel-ai-gateway", url: "https://ai-gateway.vercel.sh/v1", oidcToken: "short-lived-vercel-token", model: "poolside/laguna-s-2.1-free" });
   });
+
+  it("prefers the Vercel Function runtime OIDC header over build-time credentials", () => {
+    expect(getAnalysisProviderConfig({ VERCEL_OIDC_TOKEN: "build-token", AI_API_KEY: "provider-secret" }, "function-request-token")).toEqual({ kind: "vercel-ai-gateway", url: "https://ai-gateway.vercel.sh/v1", oidcToken: "function-request-token", model: "poolside/laguna-s-2.1-free" });
+  });
 });

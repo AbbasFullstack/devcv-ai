@@ -12,12 +12,12 @@ export function getAnalysisProviderConfig(environment: ProviderEnvironment = {
   AI_API_KEY: process.env.AI_API_KEY,
   AI_BASE_URL: process.env.AI_BASE_URL,
   AI_MODEL: process.env.AI_MODEL,
-}): AnalysisProviderConfig | null {
+}, runtimeOidcToken?: string): AnalysisProviderConfig | null {
   const workerUrl = environment.CLOUDFLARE_WORKER_URL?.trim().replace(/\/$/, "");
   const workerSharedSecret = environment.CLOUDFLARE_WORKER_SHARED_SECRET?.trim();
   if (workerUrl && workerSharedSecret) return { kind: "cloudflare-worker", url: workerUrl, sharedSecret: workerSharedSecret };
 
-  const oidcToken = environment.VERCEL_OIDC_TOKEN?.trim();
+  const oidcToken = runtimeOidcToken?.trim() || environment.VERCEL_OIDC_TOKEN?.trim();
   if (oidcToken) return { kind: "vercel-ai-gateway", url: "https://ai-gateway.vercel.sh/v1", oidcToken, model: "poolside/laguna-s-2.1-free" };
 
   const apiKey = environment.AI_API_KEY?.trim();
