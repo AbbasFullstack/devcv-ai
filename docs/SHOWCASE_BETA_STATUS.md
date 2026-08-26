@@ -8,7 +8,7 @@ DevCV AI is a **private showcase beta** for privacy-conscious resume drafting an
 
 | Area | Verified behavior |
 |---|---|
-| Authentication | A non-personal synthetic account could sign up and reach its protected workspace under the temporary showcase-beta policy. Unauthenticated dashboard access redirected to sign-in. |
+| Authentication | A non-personal synthetic account signed up and reached its protected workspace during controlled QA. Unauthenticated dashboard access redirected to sign-in. Email confirmation has since been restored. |
 | Privacy model | The isolated DevCV Supabase project uses owner-scoped row-level security. Resume text is not stored automatically after an analysis request. |
 | Resume history | A synthetic resume version was explicitly saved, client workspace was cleared, the version was loaded again, and it was deleted from the UI. Final verification found `0` saved resume versions and `0` analysis runs. |
 | Preview safeguard | Preview/sample feedback is clearly labelled and is prevented by validation from being persisted as a real AI analysis result. |
@@ -18,7 +18,7 @@ DevCV AI is a **private showcase beta** for privacy-conscious resume drafting an
 
 The Vercel AI Gateway integration uses short-lived server-side OIDC authentication and never exposes a provider API key to the browser. The connected Vercel team currently requires customer verification before it will execute AI Gateway requests. DevCV therefore shows an accurate verification-required beta message and does not save a submitted resume when an AI request cannot run.
 
-Email confirmation is temporarily disabled only for this isolated showcase beta because the default Supabase email service is unsuitable for public self-service delivery. Before any public launch or broad invite, email confirmation must be re-enabled and a guardian-approved delivery provider configured.
+Email confirmation is enabled. The default Supabase email service is still unsuitable for broad public self-service delivery, so DevCV remains a limited private beta until a guardian-approved delivery provider is configured.
 
 ## Safe portfolio wording
 
@@ -26,4 +26,4 @@ Email confirmation is temporarily disabled only for this isolated showcase beta 
 
 ## Do not claim
 
-Do not claim that live AI analysis is verified, that the service is ready for public self-service users, that email delivery is production-ready, or that it offers unlimited/free AI usage.
+Do not claim that live AI analysis is verified, that public-scale email delivery is production-ready, or that DevCV offers unlimited/free AI usage.
