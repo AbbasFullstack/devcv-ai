@@ -19,6 +19,13 @@ export async function POST(request: Request) {
         ? await fetch(`${provider.url}/chat/completions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${provider.oidcToken}` }, body: JSON.stringify({ model: provider.model, response_format: { type: "json_object" }, messages: [{ role: "system", content: "You are a precise resume analyst in a limited beta. Return JSON only with overallScore, atsScore, clarityScore, impactScore, keywords, findings, summaryRewrite. Do not invent employers, degrees, metrics, technologies, or achievements. Frame uncertain suggestions conditionally." }, { role: "user", content: `Target role: ${parsed.data.role}\n\nResume:\n${parsed.data.resume}` }] }), cache: "no-store" })
       : await fetch(`${provider.url}/chat/completions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${provider.apiKey}` }, body: JSON.stringify({ model: provider.model, response_format: { type: "json_object" }, messages: [{ role: "system", content: "You are a precise resume analyst. Return JSON only with overallScore, atsScore, clarityScore, impactScore, keywords, findings, summaryRewrite. Do not invent employers, degrees, metrics, technologies, or achievements. Frame uncertain suggestions conditionally." }, { role: "user", content: `Target role: ${parsed.data.role}\n\nResume:\n${parsed.data.resume}` }] }) });
     if (!response.ok) {
+      const providerFailure = await response.json().catch(() => null) as { error?: { code?: unknown; type?: unknown } } | null;
+      console.error("AI_PROVIDER_REQUEST_FAILED", {
+        provider: provider.kind,
+        status: response.status,
+        code: typeof providerFailure?.error?.code === "string" ? providerFailure.error.code : "unavailable",
+        type: typeof providerFailure?.error?.type === "string" ? providerFailure.error.type : "unavailable",
+      });
       const error = provider.kind === "vercel-ai-gateway"
         ? response.status === 429 ? "The Vercel AI beta quota is temporarily exhausted. Try again later; no resume was saved." : "The Vercel AI beta is temporarily unavailable. No resume was saved."
         : "The AI provider could not complete this request.";
