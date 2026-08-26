@@ -3,6 +3,7 @@ import { z } from "zod";
 import { analysisPayloadSchema } from "@/lib/resume";
 import { getCurrentUser, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getAnalysisProviderConfig } from "@/lib/analysis-provider";
+import { getVercelGatewayErrorMessage } from "@/lib/ai-errors";
 
 const requestSchema = z.object({ role: z.string().trim().min(2).max(100), resume: z.string().trim().min(80).max(24000) }).strict();
 
@@ -26,8 +27,9 @@ export async function POST(request: Request) {
         code: typeof providerFailure?.error?.code === "string" ? providerFailure.error.code : "unavailable",
         type: typeof providerFailure?.error?.type === "string" ? providerFailure.error.type : "unavailable",
       });
+      const failureType = typeof providerFailure?.error?.type === "string" ? providerFailure.error.type : undefined;
       const error = provider.kind === "vercel-ai-gateway"
-        ? response.status === 429 ? "The Vercel AI beta quota is temporarily exhausted. Try again later; no resume was saved." : "The Vercel AI beta is temporarily unavailable. No resume was saved."
+        ? getVercelGatewayErrorMessage(response.status, failureType)
         : "The AI provider could not complete this request.";
       return NextResponse.json({ error }, { status: 502 });
     }
